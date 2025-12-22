@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - SkillBridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-xl font-bold">Mi Perfil</span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="window.location.href='dashboard.html'" class="text-indigo-600 hover:text-indigo-700 font-medium">
+                    Dashboard
+                </button>
+                <button onclick="logout()" class="text-gray-600 hover:text-gray-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-8 text-white mb-8 fade-in">
+            <div class="flex items-center gap-6">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-16 h-16 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 id="profile-name" class="text-3xl font-bold mb-2">Cargando...</h1>
+                    <p id="profile-username" class="text-purple-100"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Information -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Información Personal</h2>
+                <button id="edit-btn" onclick="toggleEdit()" class="text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Editar
+                </button>
+            </div>
+
+            <form id="profile-form" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                        <input type="text" id="nombre" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+                        <input type="text" id="username" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Universidad</label>
+                    <input type="text" id="universidad" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100">
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Carrera</label>
+                        <input type="text" id="carrera" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ciclo</label>
+                        <input type="text" id="ciclo" disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100">
+                    </div>
+                </div>
+
+                <div id="form-buttons" class="hidden flex gap-4">
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                        Guardar Cambios
+                    </button>
+                    <button type="button" onclick="cancelEdit()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                </div>
+
+                <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                    ✓ Perfil actualizado exitosamente
+                </div>
+
+                <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"></div>
+            </form>
+        </div>
+
+        <!-- Account Information -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 fade-in">
+            <h2 class="text-2xl font-bold mb-6">Información de Cuenta</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Fecha de Registro</p>
+                            <p id="fecha-registro" class="text-sm text-gray-600">Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Estado de Cuenta</p>
+                            <p class="text-sm text-green-600 font-semibold">Activa</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Evaluaciones Realizadas</p>
+                            <p id="total-evaluations" class="text-sm text-gray-600">Cargando...</p>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='history.html'" class="text-indigo-600 hover:text-indigo-700 font-semibold">
+                        Ver Historial →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://back-skillbridge.onrender.com/api';
+        let originalData = {};
+        
+        if (!sessionStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+
+        async function loadProfile() {
+            const userId = sessionStorage.getItem('userId');
+            const token = sessionStorage.getItem('authToken');
+
+            try {
+                // Load user data
+                const userResponse = await fetch(`${API_BASE}/user/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!userResponse.ok) throw new Error('Failed to load profile');
+
+                const userData = await userResponse.json();
+                originalData = { ...userData };
+
+                // Populate form
+                document.getElementById('profile-name').textContent = userData.nombre;
+                document.getElementById('profile-username').textContent = '@' + userData.username;
+                document.getElementById('nombre').value = userData.nombre;
+                document.getElementById('username').value = userData.username;
+                document.getElementById('universidad').value = userData.universidad;
+                document.getElementById('carrera').value = userData.carrera;
+                document.getElementById('ciclo').value = userData.ciclo;
+                document.getElementById('fecha-registro').textContent = new Date(userData.fechaRegistro).toLocaleDateString('es-PE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                // Load evaluation count
+                const historyResponse = await fetch(`${API_BASE}/evaluation/history/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (historyResponse.ok) {
+                    const historyData = await historyResponse.json();
+                    document.getElementById('total-evaluations').textContent = `${historyData.length} evaluaciones`;
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError('Error al cargar el perfil');
+            }
+        }
+
+        function toggleEdit() {
+            const inputs = ['nombre', 'universidad', 'carrera', 'ciclo'];
+            const isDisabled = document.getElementById('nombre').disabled;
+
+            inputs.forEach(id => {
+                document.getElementById(id).disabled = !isDisabled;
+            });
+
+            document.getElementById('form-buttons').classList.toggle('hidden');
+            document.getElementById('edit-btn').innerHTML = isDisabled ? 
+                '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> Cancelar Edición' :
+                '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Editar';
+        }
+
+        function cancelEdit() {
+            document.getElementById('nombre').value = originalData.nombre;
+            document.getElementById('universidad').value = originalData.universidad;
+            document.getElementById('carrera').value = originalData.carrera;
+            document.getElementById('ciclo').value = originalData.ciclo;
+            toggleEdit();
+            hideMessages();
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessages();
+
+            const userId = sessionStorage.getItem('userId');
+            const token = sessionStorage.getItem('authToken');
+
+            const updateData = {
+                nombre: document.getElementById('nombre').value,
+                universidad: document.getElementById('universidad').value,
+                carrera: document.getElementById('carrera').value,
+                ciclo: document.getElementById('ciclo').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/user/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!response.ok) throw new Error('Failed to update profile');
+
+                const updatedData = await response.json();
+                originalData = { ...updatedData };
+
+                // Update header
+                document.getElementById('profile-name').textContent = updatedData.nombre;
+                sessionStorage.setItem('userName', updatedData.nombre);
+
+                showSuccess();
+                toggleEdit();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showError('Error al actualizar el perfil. Intenta de nuevo.');
+            }
+        });
+
+        function showSuccess() {
+            const msg = document.getElementById('success-message');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+
+        function showError(text) {
+            const msg = document.getElementById('error-message');
+            msg.textContent = text;
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+
+        function hideMessages() {
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        loadProfile();
+    </script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - SkillBridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bounce { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span class="text-xl font-bold">Tus Resultados</span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="window.location.href='dashboard.html'" class="text-indigo-600 hover:text-indigo-700 font-medium">
+                    Dashboard
+                </button>
+                <button onclick="logout()" class="text-gray-600 hover:text-gray-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- Score Header -->
+        <div id="score-header" class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-8 text-white mb-8 fade-in">
+            <div class="text-center">
+                <div class="animate-pulse">Cargando resultados...</div>
+            </div>
+        </div>
+
+        <!-- Skills Comparison -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 fade-in">
+            <h2 class="text-2xl font-bold mb-6">Comparación con el Mercado</h2>
+            <canvas id="comparison-chart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Learning Path -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 fade-in">
+            <h2 class="text-2xl font-bold mb-6">Tu Ruta de Aprendizaje Personalizada</h2>
+            <div id="learning-path" class="space-y-6">
+                <div class="text-center py-8 text-gray-500">
+                    Generando tu plan personalizado...
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="bg-indigo-50 rounded-2xl p-8 fade-in">
+            <h3 class="text-xl font-bold mb-4">Próximos Pasos</h3>
+            <ul class="space-y-2 text-gray-700">
+                <li class="flex items-center gap-2">
+                    <span class="text-green-600">✅</span>
+                    <span>Guarda estos resultados para seguimiento</span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-yellow-600">🎯</span>
+                    <span>Comienza con el primer curso de alta prioridad</span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-blue-600">💬</span>
+                    <span>Chatea con SkillBot para consejos personalizados</span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-purple-600">📅</span>
+                    <span>Re-evalúa tus habilidades en 3 meses</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Floating Chatbot Button -->
+    <button id="chat-button" onclick="toggleChat()" class="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition bounce">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+        </svg>
+    </button>
+
+    <!-- Chatbot Panel -->
+    <div id="chat-panel" class="hidden fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col">
+        <div class="bg-indigo-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span class="font-bold">SkillBot</span>
+            </div>
+            <button onclick="toggleChat()" class="hover:bg-indigo-700 rounded p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="text-center text-gray-500 mt-8">
+                <svg class="w-12 h-12 mx-auto mb-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <p class="font-semibold">¡Hola! Soy SkillBot</p>
+                <p class="text-sm mt-2">¿En qué puedo ayudarte hoy?</p>
+            </div>
+        </div>
+
+        <div class="p-4 border-t">
+            <div class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                <button onclick="sendMessage()" class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-2">
+                <button onclick="quickMessage('¿Cómo puedo mejorar en React?')" class="text-xs px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200">
+                    Mejorar React
+                </button>
+                <button onclick="quickMessage('Dame consejos de aprendizaje')" class="text-xs px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200">
+                    Consejos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://back-skillbridge.onrender.com/api';
+        let results = null;
+        
+        if (!sessionStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const evaluationId = urlParams.get('id');
+
+        if (!evaluationId) {
+            window.location.href = 'dashboard.html';
+        }
+
+        async function loadResults() {
+            try {
+                const response = await fetch(`${API_BASE}/evaluation/results/${evaluationId}`, {
+                    headers: { 'Authorization': `Bearer ${sessionStorage.getItem('authToken')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load results');
+
+                results = await response.json();
+                renderResults();
+            } catch (error) {
+                alert('Error al cargar resultados: ' + error.message);
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        function renderResults() {
+            const nivel = results.puntuacionGeneral >= 70 ? 'Avanzado' : 
+                         results.puntuacionGeneral >= 40 ? 'Intermedio' : 'Básico';
+            
+            document.getElementById('score-header').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2">${results.puntuacionGeneral}/100</h1>
+                        <p class="text-xl">Nivel: ${nivel}</p>
+                        <p class="text-indigo-200 mt-2">Empleabilidad: ${results.porcentajeEmpleabilidad}%</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-indigo-200">Fecha de evaluación</p>
+                        <p class="text-lg">${new Date(results.fecha).toLocaleDateString('es-PE')}</p>
+                    </div>
+                </div>
+            `;
+
+            renderChart();
+            renderLearningPath();
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('comparison-chart').getContext('2d');
+            const skillNames = Object.keys(results.skills);
+            const userLevels = skillNames.map(skill => results.skills[skill].nivel);
+            const marketDemand = skillNames.map(skill => results.skills[skill].mercado);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: skillNames,
+                    datasets: [
+                        {
+                            label: 'Tu Nivel',
+                            data: userLevels,
+                            backgroundColor: '#3B82F6',
+                            borderColor: '#2563EB',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Demanda del Mercado',
+                            data: marketDemand,
+                            backgroundColor: '#10B981',
+                            borderColor: '#059669',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function renderLearningPath() {
+            const learningPath = document.getElementById('learning-path');
+            learningPath.innerHTML = results.rutaAprendizaje.map(item => {
+                const prioridadColor = item.prioridad === 'Alta' ? 'bg-red-100 text-red-700' :
+                                      item.prioridad === 'Media' ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-green-100 text-green-700';
+                
+                return `
+                    <div class="border-l-4 border-indigo-600 pl-6 py-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold ${prioridadColor}">
+                                    ${item.prioridad} Prioridad
+                                </span>
+                                <h3 class="text-xl font-bold mt-2">${item.skill}</h3>
+                            </div>
+                            <span class="text-sm text-gray-600">${item.duracion}</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">${item.razon}</p>
+                        <div class="space-y-2">
+                            <p class="font-semibold text-sm">Recursos recomendados:</p>
+                            ${item.recursos.map(recurso => `
+                                <a href="${recurso.url}" target="_blank" class="block text-indigo-600 hover:text-indigo-800 text-sm">
+                                    • ${recurso.nombre} (${recurso.tipo})
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleChat() {
+            const chatPanel = document.getElementById('chat-panel');
+            const chatButton = document.getElementById('chat-button');
+            
+            if (chatPanel.classList.contains('hidden')) {
+                chatPanel.classList.remove('hidden');
+                chatButton.classList.add('hidden');
+            } else {
+                chatPanel.classList.add('hidden');
+                chatButton.classList.remove('hidden');
+            }
+        }
+
+        function quickMessage(msg) {
+            document.getElementById('chat-input').value = msg;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            messagesContainer.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="max-w-[80%] p-3 rounded-lg bg-indigo-600 text-white">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            messagesContainer.innerHTML += `
+                <div class="flex justify-start" id="typing-indicator">
+                    <div class="bg-gray-100 p-3 rounded-lg">
+                        <span class="text-gray-500">SkillBot está escribiendo...</span>
+                    </div>
+                </div>
+            `;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_BASE}/chat/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({
+                        userId: parseInt(sessionStorage.getItem('userId')),
+                        mensaje: message,
+                        contexto: {
+                            puntuacionGeneral: results?.puntuacionGeneral,
+                            skillsDebiles: results ? Object.entries(results.skills)
+                                .filter(([_, data]) => data.prioridad === 'Alta')
+                                .map(([skill, _]) => skill) : []
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById('typing-indicator').remove();
+                
+                messagesContainer.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="max-w-[80%] p-3 rounded-lg bg-gray-100 text-gray-800">
+                            ${data.respuesta}
+                        </div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch (error) {
+                document.getElementById('typing-indicator').remove();
+                messagesContainer.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="max-w-[80%] p-3 rounded-lg bg-gray-100 text-gray-800">
+                            Lo siento, ocurrió un error. Intenta de nuevo.
+                        </div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>

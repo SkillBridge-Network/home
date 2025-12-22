@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación - SkillBridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span class="text-xl font-bold">Evaluación de Competencias</span>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="text-gray-600 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span id="question-counter">Pregunta 1 de 10</span>
+                <span id="progress-percentage">10% completado</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 fade-in">
+            <div class="mb-6">
+                <span id="question-category" class="inline-block px-4 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold mb-4">
+                    Programación
+                </span>
+                <h2 id="question-text" class="text-2xl font-bold text-gray-900">
+                    ¿Cuál es tu nivel de experiencia con JavaScript?
+                </h2>
+            </div>
+
+            <div id="options-container" class="space-y-3">
+                <!-- Options will be inserted here -->
+            </div>
+
+            <button id="next-button" onclick="handleNext()" disabled class="w-full mt-8 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed">
+                Siguiente
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://back-skillbridge.onrender.com/api';
+        
+        // Check authentication
+        if (!sessionStorage.getItem('authToken')) {
+            window.location.href = 'login.html';
+        }
+
+        let currentQuestion = 0;
+        let selectedAnswer = null;
+        let answers = {};
+
+        const questions = [
+            { id: 1, category: 'Programación', skill: 'JavaScript', question: '¿Cuál es tu nivel de experiencia con JavaScript?', options: ['Básico', 'Intermedio', 'Avanzado', 'Experto'], weight: 1.2 },
+            { id: 2, category: 'Backend', skill: 'APIs REST', question: '¿Has desarrollado APIs REST con autenticación?', options: ['Nunca', 'Algunas veces', 'Frecuentemente', 'Es mi especialidad'], weight: 1.3 },
+            { id: 3, category: 'Frontend', skill: 'React', question: '¿Cuál es tu experiencia con React?', options: ['No lo conozco', 'Básico', 'Intermedio', 'Avanzado'], weight: 1.5 },
+            { id: 4, category: 'Bases de Datos', skill: 'SQL', question: '¿Puedes escribir queries SQL complejas?', options: ['No', 'Con ayuda', 'Sí, sin problemas', 'Optimizo queries avanzadas'], weight: 1.1 },
+            { id: 5, category: 'DevOps', skill: 'Git', question: '¿Cuál es tu dominio de Git y control de versiones?', options: ['Básico', 'Intermedio', 'Avanzado', 'Experto en workflows'], weight: 1.0 },
+            { id: 6, category: 'Backend', skill: 'Node.js', question: '¿Has trabajado con Node.js?', options: ['Nunca', 'Básico', 'Intermedio', 'Experto'], weight: 1.2 },
+            { id: 7, category: 'Frontend', skill: 'CSS/Tailwind', question: '¿Qué tan cómodo te sientes con CSS moderno?', options: ['Básico', 'Intermedio', 'Avanzado', 'Experto'], weight: 1.0 },
+            { id: 8, category: 'Bases de Datos', skill: 'MongoDB', question: '¿Has trabajado con bases de datos NoSQL como MongoDB?', options: ['No', 'Básico', 'Intermedio', 'Avanzado'], weight: 1.0 },
+            { id: 9, category: 'DevOps', skill: 'Docker', question: '¿Tienes experiencia con Docker y contenedores?', options: ['No', 'Básico', 'Intermedio', 'Experto'], weight: 1.1 },
+            { id: 10, category: 'Programación', skill: 'TypeScript', question: '¿Cuál es tu nivel con TypeScript?', options: ['No lo conozco', 'Básico', 'Intermedio', 'Avanzado'], weight: 1.3 }
+        ];
+
+        function renderQuestion() {
+            const question = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+            document.getElementById('question-counter').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('progress-percentage').textContent = `${Math.round(progress)}% completado`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('question-category').textContent = question.category;
+            document.getElementById('question-text').textContent = question.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'w-full p-4 text-left rounded-lg border-2 transition border-gray-200 hover:border-indigo-300';
+                button.innerHTML = `<span class="font-medium">${option}</span>`;
+                button.onclick = () => selectAnswer(option, button);
+                optionsContainer.appendChild(button);
+            });
+
+            selectedAnswer = null;
+            document.getElementById('next-button').disabled = true;
+            document.getElementById('next-button').className = 'w-full mt-8 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed';
+        }
+
+        function selectAnswer(answer, buttonEl) {
+            selectedAnswer = answer;
+            
+            document.querySelectorAll('#options-container button').forEach(btn => {
+                btn.className = 'w-full p-4 text-left rounded-lg border-2 transition border-gray-200 hover:border-indigo-300';
+            });
+            
+            buttonEl.className = 'w-full p-4 text-left rounded-lg border-2 transition border-indigo-600 bg-indigo-50';
+            
+            const nextBtn = document.getElementById('next-button');
+            nextBtn.disabled = false;
+            nextBtn.className = 'w-full mt-8 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700';
+        }
+
+        async function handleNext() {
+            if (!selectedAnswer) return;
+
+            const question = questions[currentQuestion];
+            answers[question.id] = {
+                questionId: question.id,
+                skill: question.skill,
+                respuesta: selectedAnswer
+            };
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                await finishTest();
+            }
+        }
+
+        async function finishTest() {
+            const evaluationData = {
+                userId: parseInt(sessionStorage.getItem('userId')),
+                fecha: new Date().toISOString(),
+                respuestas: Object.values(answers)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/evaluation/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify(evaluationData)
+                });
+
+                if (!response.ok) throw new Error('Submit failed');
+
+                const data = await response.json();
+                window.location.href = `results.html?id=${data.evaluationId}`;
+            } catch (error) {
+                alert('Error al procesar evaluación: ' + error.message);
+            }
+        }
+
+        // Initialize
+        renderQuestion();
+    </script>
+</body>
+</html>
